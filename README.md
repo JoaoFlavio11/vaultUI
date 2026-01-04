@@ -71,3 +71,4 @@ export default defineConfig([
   },
 ])
 ```
+perfeito, executei os 3 comandos, vamos para o próximo passo
