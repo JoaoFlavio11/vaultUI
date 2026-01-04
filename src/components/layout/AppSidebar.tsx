@@ -1,4 +1,6 @@
-import { Plus, MessageSquare, Trash2, Settings } from 'lucide-react';
+import { MessageSquare, Plus, Settings, Trash2 } from 'lucide-react';
+import { Button } from '../../components/ui/button';
+import { ScrollArea } from '../../components/ui/scroll-area';
 import {
   Sidebar,
   SidebarContent,
@@ -8,9 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '../../components/ui/sidebar';
-import { Button } from '../../components/ui/button';
-import { ScrollArea } from '../../components/ui/scroll-area';
-import { Conversation } from '../../types/chat';
+import type { Conversation } from '../../types/chat';
 
 interface AppSidebarProps {
   conversations: Conversation[];

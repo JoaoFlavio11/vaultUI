@@ -1,74 +1,73 @@
-import { SidebarProvider, SidebarTrigger } from '../../components/ui/sidebar';
-import { AppSidebar } from './AppSidebar';
-import { useChatHistory } from '../../hooks/useChatHistory';
-import { ChatArea } from '../../components/chat/ChatArea';
-import { useState } from 'react';
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+import { useState } from "react";
+import { ChatArea } from "../../components/chat/ChatArea";
+import { SidebarProvider, SidebarTrigger } from "../../components/ui/sidebar";
+import { useChatHistory } from "../../hooks/useChatHistory";
+import { AppSidebar } from "./AppSidebar";
 
 export function ChatLayout() {
-  const {
-    conversations,
-    activeConversation,
-    activeConversationId,
-    setActiveConversationId,
-    createConversation,
-    addMessage,
-    deleteConversation,
-  } = useChatHistory();
+	const {
+		conversations,
+		activeConversation,
+		activeConversationId,
+		setActiveConversationId,
+		createConversation,
+		addMessage,
+		deleteConversation,
+	} = useChatHistory();
 
-  const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
-  const handleNewConversation = () => {
-    createConversation();
-  };
+	const handleNewConversation = () => {
+		createConversation();
+	};
 
-  const handleSendMessage = async (content: string) => {
-    let conversationId = activeConversationId;
-    
-    // Create new conversation if none active
-    if (!conversationId) {
-      conversationId = createConversation(content);
-    }
+	const handleSendMessage = async (content: string) => {
+		let conversationId = activeConversationId;
 
-    // Add user message
-    addMessage(conversationId, { content, role: 'user' });
+		// Create new conversation if none active
+		if (!conversationId) {
+			conversationId = createConversation(content);
+		}
 
-    // Simulate AI response
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    addMessage(conversationId, {
-      content: `Esta é uma resposta simulada para: "${content}"`,
-      role: 'assistant',
-    });
-    setIsLoading(false);
-  };
+		// Add user message
+		addMessage(conversationId, { content, role: "user" });
 
-  return (
-    <SidebarProvider>
-      <div className="flex h-screen w-full">
-        <AppSidebar
-          conversations={conversations}
-          activeConversationId={activeConversationId}
-          onSelectConversation={setActiveConversationId}
-          onNewConversation={handleNewConversation}
-          onDeleteConversation={deleteConversation}
-        />
-        
-        <main className="flex-1 flex flex-col">
-          <header className="h-14 border-b border-border flex items-center px-4 gap-4">
-            <SidebarTrigger />
-            <h1 className="font-semibold">
-              {activeConversation?.title || 'Nova Conversa'}
-            </h1>
-          </header>
-          
-          <ChatArea
-            conversation={activeConversation}
-            onSendMessage={handleSendMessage}
-            isLoading={isLoading}
-          />
-        </main>
-      </div>
-    </SidebarProvider>
-  );
+		// Simulate AI response
+		setIsLoading(true);
+		await new Promise((resolve) => setTimeout(resolve, 1500));
+
+		addMessage(conversationId, {
+			content: `Esta é uma resposta simulada para: "${content}"`,
+			role: "assistant",
+		});
+		setIsLoading(false);
+	};
+
+	return (
+		<SidebarProvider>
+			<div className="flex h-screen w-full">
+				<AppSidebar
+					conversations={conversations}
+					activeConversationId={activeConversationId}
+					onSelectConversation={setActiveConversationId}
+					onNewConversation={handleNewConversation}
+					onDeleteConversation={deleteConversation}
+				/>
+
+				<main className="flex-1 flex flex-col">
+					<header className="flex items-center gap-2 p-4 border-b border-border">
+						<SidebarTrigger />
+						<h1 className="text-lg font-semibold">VaultUI Chat</h1>
+					</header>
+
+					<ChatArea
+						conversation={activeConversation}
+						onSendMessage={handleSendMessage}
+						isLoading={isLoading}
+					/>
+				</main>
+			</div>
+		</SidebarProvider>
+	);
 }
