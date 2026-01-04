@@ -71,4 +71,4 @@ export default defineConfig([
   },
 ])
 ```
-perfeito, executei os 3 comandos, vamos para o próximo passo
+gostei, vamos para a próxima etapa agora, lembre-se, me mande o código que eu programo no meu pc aqui amigo
