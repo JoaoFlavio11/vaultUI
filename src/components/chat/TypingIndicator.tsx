@@ -1,16 +1,23 @@
-import { Bot } from "lucide-react";
+import { cn } from "../../lib/utils";
 
-export function TypingIndicator() {
+interface TypingIndicatorProps {
+  className?: string;
+}
+
+const TypingIndicator = ({ className }: TypingIndicatorProps) => {
   return (
-    <div className="flex gap-3 animate-fade-in">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-        <Bot className="h-4 w-4" />
+    <div className={cn("flex items-center gap-3 p-4", className)}>
+      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+        <span className="text-sm">🤖</span>
       </div>
-      <div className="flex items-center gap-1 rounded-2xl bg-muted px-4 py-3">
-        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
+      
+      <div className="flex items-center gap-1 px-4 py-3 rounded-2xl bg-muted">
+        <span className="w-2 h-2 rounded-full bg-foreground/50 animate-bounce [animation-delay:-0.3s]" />
+        <span className="w-2 h-2 rounded-full bg-foreground/50 animate-bounce [animation-delay:-0.15s]" />
+        <span className="w-2 h-2 rounded-full bg-foreground/50 animate-bounce" />
       </div>
     </div>
   );
-}
+};
+
+export default TypingIndicator;
