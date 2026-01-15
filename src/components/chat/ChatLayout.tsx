@@ -1,136 +1,96 @@
+/** biome-ignore-all lint/a11y/useSemanticElements: <explanation> */
+import * as React from "react";
+import { Menu } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { useState } from "react";
+import type { Conversation, Message } from "../../types/chat";
+import { Button } from "../ui/button";
 import { ChatArea } from "./ChatArea";
 import { Sidebar } from "./Sidebar";
 
-export interface Message {
-	id: string;
-	role: "user" | "assistant";
-	content: string;
-	timestamp: Date;
+interface ChatLayoutProps {
+  conversations: Conversation[];
+  activeConversation: Conversation | null;
+  messages: Message[];
+  isTyping?: boolean;
+  onSelectConversation: (id: string) => void;
+  onCreateConversation: () => void;
+  onDeleteConversation: (id: string) => void;
+  onSendMessage: (content: string) => void;
+  onRegenerate?: (messageId: string) => void;
+  // Ajustado para 1 argumento para ser compatível com ChatArea
+  onEdit?: (messageId: string) => void;
 }
 
-export interface Conversation {
-	id: string;
-	title: string;
-	messages: Message[];
-	createdAt: Date;
-	updatedAt: Date;
-}
+export function ChatLayout({ ...props }: ChatLayoutProps) {
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
 
-export function ChatLayout() {
-	const [sidebarOpen, setSidebarOpen] = useState(true);
-	const [conversations, setConversations] = useState<Conversation[]>([]);
-	const [activeConversation, setActiveConversation] = useState<string | null>(
-		null,
-	);
+  return (
+    <div className="flex h-screen w-full overflow-hidden bg-background">
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div
+          role="button"
+          tabIndex={-1}
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileOpen(false)}
+          onKeyDown={(e) => e.key === "Enter" && setMobileOpen(false)}
+        />
+      )}
 
-	const handleNewChat = () => {
-		const newConversation: Conversation = {
-			id: crypto.randomUUID(),
-			title: "Nova conversa",
-			messages: [],
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		};
-		setConversations((prev) => [newConversation, ...prev]);
-		setActiveConversation(newConversation.id);
-	};
+      {/* Sidebar - Desktop & Mobile */}
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 md:relative md:translate-x-0 transition-transform duration-300",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <Sidebar
+          conversations={props.conversations}
+          activeId={props.activeConversation?.id ?? null}
+          onSelect={(id) => {
+            props.onSelectConversation(id);
+            setMobileOpen(false);
+          }}
+          onCreate={props.onCreateConversation}
+          onDelete={props.onDeleteConversation}
+          isCollapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} // Lógica de fechar/abrir
+        />
+      </div>
 
-	const handleSelectConversation = (id: string) => {
-		setActiveConversation(id);
-	};
+      {/* Main Content */}
+      <div className="flex flex-1 flex-col min-w-0"> {/* min-w-0 evita quebra de layout com truncate */}
+        {/* Header - Mobile ou Desktop quando Sidebar está fechada */}
+        <header className="flex items-center gap-2 border-b border-border p-3">
+          {/* Menu Hambúrguer para Mobile */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
 
-	const handleDeleteConversation = (id: string) => {
-		setConversations((prev) => prev.filter((c) => c.id !== id));
-		if (activeConversation === id) {
-			setActiveConversation(null);
-		}
-	};
+          {/* Botão de abrir Sidebar caso esteja colapsada (Opcional, estilo ChatGPT) */}
 
-	const handleSendMessage = (content: string) => {
-		if (!activeConversation) {
-			handleNewChat();
-		}
+          <h1 className="text-sm font-medium truncate">
+            {props.activeConversation?.title ?? "VaultUI"}
+          </h1>
+        </header>
 
-		const userMessage: Message = {
-			id: crypto.randomUUID(),
-			role: "user",
-			content,
-			timestamp: new Date(),
-		};
-
-		setConversations((prev) =>
-			prev.map((conv) => {
-				if (conv.id === activeConversation) {
-					const updatedMessages = [...conv.messages, userMessage];
-					return {
-						...conv,
-						messages: updatedMessages,
-						title:
-							conv.messages.length === 0
-								? content.slice(0, 30) + "..."
-								: conv.title,
-						updatedAt: new Date(),
-					};
-				}
-				return conv;
-			}),
-		);
-
-		// Simular resposta do assistente (será substituído pela integração Ollama)
-		setTimeout(() => {
-			const assistantMessage: Message = {
-				id: crypto.randomUUID(),
-				role: "assistant",
-				content:
-					"Esta é uma resposta simulada. A integração com Ollama será implementada na Fase 5.",
-				timestamp: new Date(),
-			};
-
-			setConversations((prev) =>
-				prev.map((conv) => {
-					if (conv.id === activeConversation) {
-						return {
-							...conv,
-							messages: [...conv.messages, assistantMessage],
-							updatedAt: new Date(),
-						};
-					}
-					return conv;
-				}),
-			);
-		}, 1000);
-	};
-
-	const currentConversation = conversations.find(
-		(c) => c.id === activeConversation,
-	);
-
-	return (
-		<div className="flex h-screen w-full overflow-hidden bg-background">
-			<Sidebar
-				isOpen={sidebarOpen}
-				onToggle={() => setSidebarOpen(!sidebarOpen)}
-				conversations={conversations}
-				activeId={activeConversation}
-				onNewChat={handleNewChat}
-				onSelect={handleSelectConversation}
-				onDelete={handleDeleteConversation}
-			/>
-			<main
-				className={cn(
-					"flex-1 transition-all duration-300 ease-in-out",
-					sidebarOpen ? "md:ml-64" : "ml-0",
-				)}
-			>
-				<ChatArea
-					conversation={currentConversation}
-					onSendMessage={handleSendMessage}
-					onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-					sidebarOpen={sidebarOpen}
-				/>
-			</main>
-		</div>
-	);
+        {/* Chat Area */}
+        <div className="flex-1 overflow-hidden">
+          <ChatArea
+            messages={props.messages}
+            isTyping={props.isTyping}
+            onSendMessage={props.onSendMessage}
+            onRegenerate={props.onRegenerate}
+            onEdit={props.onEdit}
+          />
+        </div>
+      </div>
+    </div>
+  );
 }
