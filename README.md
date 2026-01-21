@@ -1,10 +1,10 @@
-# Agent UI
+# Self Agent UI
 
 > **Objetivo:** criar uma UI genérica, modular e personalizável para agentes de IA self-hosted, permitindo que empresas e clientes adaptem a experiência, visual, integrações e fluxos às suas próprias demandas.
 
 ## 📌 **Descrição**
 
-O **Agent UI** é uma interface moderna e flexível construída para ser utilizada em conjunto com agentes de Inteligência Artificial **self-hosted**. A proposta é permitir que qualquer organização possa:
+O **Self Agent UI** é uma interface moderna e flexível construída para ser utilizada em conjunto com agentes de Inteligência Artificial **self-hosted**. A proposta é permitir que qualquer organização possa:
 
 * hospedar seu próprio agente
 * personalizar a interface e o comportamento
